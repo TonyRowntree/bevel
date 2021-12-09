@@ -1,0 +1,49 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-allchannel-ctrown
+  namespace: ctrown-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: anchorpeer-allchannel-ctrown
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: ctrown-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.ctrown-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+      localmspid: ctrownMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvctrown-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/ctrown-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/ctrown-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    anchorstx: |-
+      CuACChgKFggCGgYIqqvHjQYiCmFsbGNoYW5uZWwSwwIKwAIKCmFsbGNoYW5uZWwSYhJgCgtBcHBs
+      aWNhdGlvbhJRCAESTQoJY3Ryb3duTVNQEkAaBwoDTVNQEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3Jz
+      ZW1lbnQSACILCgdSZWFkZXJzEgAiCwoHV3JpdGVycxIAGs0BEsoBCgtBcHBsaWNhdGlvbhK6AQgB
+      ErUBCgljdHJvd25NU1ASpwEIARpbCgtBbmNob3JQZWVycxJMEkIKQAo7cGVlcjAuY3Ryb3duLW5l
+      dC5oZi5kZXYyLmF3cy5ibG9ja2NoYWluY2xvdWRwb2MtZGV2ZWxvcC5jb20Q+0EaBkFkbWlucxoH
+      CgNNU1ASACILCgdXcml0ZXJzEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3JzZW1lbnQSACILCgdSZWFk
+      ZXJzEgAqBkFkbWlucw==
+
