@@ -1,0 +1,46 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: ctrown-net-ca
+  namespace: ctrown-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: ctrown-net-ca
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: ctrown-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+ 
+    server:
+      name: ca
+      tlsstatus: true
+      admin: ctrown-admin 
+  
+    storage:
+      storageclassname: ctrownsc
+      storagesize: 512Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvctrown-net-auth
+      secretcert: secretsv2/data/crypto/peerOrganizations/ctrown-net/ca?ca.ctrown-net-cert.pem
+      secretkey: secretsv2/data/crypto/peerOrganizations/ctrown-net/ca?ctrown-net-CA.key
+      secretadminpass: secretsv2/data/credentials/ctrown-net/ca/ctrown?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: peer
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
