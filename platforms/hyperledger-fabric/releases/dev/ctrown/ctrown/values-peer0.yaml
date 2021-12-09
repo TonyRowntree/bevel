@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: ctrown-peer0
+  namespace: ctrown-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: ctrown-peer0
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: ctrown-net
+      images:
+        couchdb: couchdb:3.1
+        peer: hyperledger/fabric-peer:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.ctrown-net:7051
+      gossipexternalendpoint: peer0.ctrown-net.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+      localmspid: ctrownMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.2
+      couchdb:
+        username: ctrown-user
+
+    storage:
+      peer:
+        storageclassname: ctrownsc
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: ctrownsc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvctrown-net-auth
+      secretprefix: secretsv2/data/crypto/peerOrganizations/ctrown-net/peers/peer0.ctrown-net
+      secretambassador: secretsv2/data/crypto/peerOrganizations/ctrown-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secretsv2/data/credentials/ctrown-net/couchdb/ctrown?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: "haproxy"
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
