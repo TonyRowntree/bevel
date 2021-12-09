@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer0-ctrown-cli
+  namespace: ctrown-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer0-ctrown-cli
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: ctrown-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: ctrownsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvctrown-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/ctrown-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/ctrown-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: ctrownMSP
+      tlsstatus: true
+      address: peer0.ctrown-net.hf.develop.aws.blockchaincloudpoc-develop.com:8443
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
