@@ -63,6 +63,10 @@ spec:
           value: "{{ $.Values.vault.orderersecretprefix }}"
         - name: MOUNT_PATH
           value: /secret
+        - name: org_name
+          value: "{{ Values.metadata.name }}"
+        - name: vault_secret
+          value: {{ Values.vault.secretpath }}
         command: ["sh", "-c"]
         args:
         - |-
@@ -201,7 +205,7 @@ spec:
 
           for item in $ENDORSING_ORG_NAMES
           do
-            path="/opt/gopath/src/github.com/hyperledger/fabric/crypto/endorsers/${item}/msp/cacerts/ca.crt"
+            path="{{ vault_secret }}/crypto/peerOrganizations/{{ Values.metadata.namespace }}/endorsers/{{ org_name }}/users/admin/msp"
             COMMIT_CMD=${COMMIT_CMD}" --tlsRootCertFiles "${path}
           done
 
