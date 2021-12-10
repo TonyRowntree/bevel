@@ -1,0 +1,45 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: approve-ctony-allchannel-peer0supplychain1-1
+  namespace: ctony-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: approve-ctony-allchannel-peer0supplychain1-1
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/approve_chaincode
+  values:
+    metadata:
+      namespace: ctony-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.ctony-net:7051
+      localmspid: ctonyMSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvctony-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/ctony-net/users/admin 
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/ctony-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    orderer:
+      address: orderer1.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.2.2
+      name: supplychain
+      version: 1
+      sequence: 1
+      commitarguments: '\"init\",\"\"'
+      endorsementpolicies:  ''
+    channel:
+      name: allchannel
