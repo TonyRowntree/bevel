@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: stony-vaultkubenertes-job
+  namespace: stony-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: stony-vaultkubenertes-job
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feature/1749
+    path: platforms/hyperledger-fabric/charts/vault_kubernetes
+  values:
+    metadata:
+      name: stony
+      component_type: orderer
+      namespace: stony-net    
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      reviewer_service: vault-reviewer
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: trownenvstony-net-auth
+      policy: vault-crypto-orderer-stony-net-ro
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    k8s:
+      kubernetes_url: https://C8FA1454BFC54EBEAC7D6A70501769F2.sk1.eu-west-1.eks.amazonaws.com
