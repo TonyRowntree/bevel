@@ -65,8 +65,6 @@ spec:
           value: /secret
         - name: org_name
           value: "{{ Values.metadata.name }}"
-        - name: vault_secret
-          value: {{ Values.vault.secretpath }}
         command: ["sh", "-c"]
         args:
         - |-
