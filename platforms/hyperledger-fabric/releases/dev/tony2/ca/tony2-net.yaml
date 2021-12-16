@@ -1,0 +1,46 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: tony2-net-ca
+  namespace: tony2-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: tony2-net-ca
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feat-1749
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: tony2-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+ 
+    server:
+      name: ca
+      tlsstatus: true
+      admin: tony2-admin 
+  
+    storage:
+      storageclassname: tony2sc
+      storagesize: 512Mi
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: tonyenvtony2-net-auth
+      secretcert: secretsv2/data/crypto/peerOrganizations/tony2-net/ca?ca.tony2-net-cert.pem
+      secretkey: secretsv2/data/crypto/peerOrganizations/tony2-net/ca?tony2-net-CA.key
+      secretadminpass: secretsv2/data/credentials/tony2-net/ca/tony2?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: peer
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
