@@ -1,0 +1,60 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: tony1-net-ca-tools
+  namespace: tony1-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: tony1-net-ca-tools
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feat-1749
+    path: platforms/hyperledger-fabric/charts/catools
+  values:
+    metadata:
+      namespace: tony1-net
+      name: ca-tools
+      component_type: orderer
+      org_name: tony1
+      proxy: haproxy
+    replicaCount: 1
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      
+    storage:
+      storageclassname: tony1sc
+      storagesize: 512Mi
+    
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: tonyenvtony1-net-auth
+      secretmsp: secretsv2/data/crypto/ordererOrganizations/tony1-net/users/admin/msp
+      secrettls: secretsv2/data/crypto/ordererOrganizations/tony1-net/users/admin/tls
+      secretorderer: secretsv2/data/crypto/ordererOrganizations/tony1-net/orderers
+      secretpeer: secretsv2/data/crypto/ordererOrganizations/tony1-net/peers
+      secretpeerorderertls: secretsv2/data/crypto/ordererOrganizations/tony1-net/orderer/tls
+      secretambassador: secretsv2/data/crypto/ordererOrganizations/tony1-net/ambassador
+      secretcert: secretsv2/data/crypto/ordererOrganizations/tony1-net/ca?ca.tony1-net-cert.pem
+      secretkey: secretsv2/data/crypto/ordererOrganizations/tony1-net/ca?tony1-net-CA.key
+      secretcouchdb: secretsv2/data/credentials/tony1-net/couchdb/tony1
+      secretconfigfile: secretsv2/data/crypto/ordererOrganizations/tony1-net/msp/config
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    org_data:
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
+      component_subject: O=Orderer,L=51.50/-0.13/London,C=GB
+      cert_subject: O=Orderer/L=51.50,-0.13,London/C=GB
+      component_country: UK
+      component_state: London
+      component_location: London
+      ca_url: ca.tony1-net:7054
+
+    orderers:
+      name: orderer1-orderer2-orderer3-
