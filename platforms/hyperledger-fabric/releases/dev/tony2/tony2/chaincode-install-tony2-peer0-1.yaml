@@ -1,0 +1,52 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: chaincode-install-tony2-peer0-1
+  namespace: tony2-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: chaincode-install-tony2-peer0-1
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feat-1749
+    path: platforms/hyperledger-fabric/charts/install_chaincode
+  values:
+    metadata:
+      namespace: tony2-net
+      network:
+        version: 2.2.2
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.tony2-net:7051
+      localmspid: tony2MSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: tonyenvtony2-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/tony2-net/users/admin 
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/tony2-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretgitprivatekey: secretsv2/data/credentials/tony2-net/git?git_password
+      tls: false
+    orderer:
+      address: orderer3.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.2.2
+      name: supplychain
+      version: 1
+      lang: golang
+      maindirectory: cmd
+      repository:
+        hostname: "github.com"
+        git_username: "mgCepeda"
+        url: github.com/mgCepeda/blockchain-automation-framework.git
+        branch: master
+        path: examples/supplychain-app/fabric/chaincode_rest_server/chaincode/
+      endorsementpolicies:  ''
