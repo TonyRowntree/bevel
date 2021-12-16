@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: tony2-cacerts-job
+  namespace: tony2-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: tony2-cacerts-job
+  chart:
+    git: https://github.com/TonyRowntree/bevel.git
+    ref: feat-1749
+    path: platforms/hyperledger-fabric/charts/generate_cacerts
+  values:
+    metadata:
+      name: tony2
+      component_name: tony2-net
+      namespace: tony2-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: tonyenvtony2-net-auth
+      secretcryptoprefix: secretsv2/data/crypto/peerOrganizations/tony2-net/ca
+      secretcredentialsprefix: secretsv2/data/credentials/tony2-net/ca/tony2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      
+    ca:
+      subject: /C=GB/ST=London/L=London/O=Carrier/CN=ca.tony2-net
