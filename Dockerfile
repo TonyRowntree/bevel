@@ -56,6 +56,13 @@ RUN apt-get update && apt-get install -y \
 RUN npm install -g ajv-cli
 RUN apt-get update && apt-get install -y python3-venv
 
+RUN apt-get update \
+    && apt install software-properties-common -y
+
+RUN add-apt-repository -y ppa:ethereum/ethereum \
+    && apt-get update \
+    && apt-get install bootnode
+
 RUN rm /etc/apt/apt.conf.d/docker-clean
 RUN mkdir /etc/ansible/
 RUN /bin/echo -e "[ansible_provisioners:children]\nlocal\n[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
